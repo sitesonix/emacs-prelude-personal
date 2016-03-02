@@ -14,6 +14,7 @@
                             company-web
                             ctags
                             dash
+                            delight
                             dired+
                             elfeed
                             emmet-mode
@@ -25,14 +26,22 @@
                             lorem-ipsum
                             org2blog
                             paredit
+                            project-explorer
                             revive
                             simple-httpd
+                            smart-mode-line
+                            smart-mode-line-powerline-theme
                             skewer-mode
                             twittering-mode
                             undo-tree
                             web-beautify
+                            which-key
                             yasnippet
                             ztree))
+
+;; Set the default coding system to UTF-8
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
 
 ;; Set user details
 (setq user-full-name "Ryan Griffith")
@@ -44,6 +53,10 @@
 
 ;; Because I use Emacs built-in customize for themes (custom.el)
 (disable-theme 'zenburn)
+
+;; Enable smart-mode-line and set the theme
+(setq sml/theme 'powerline)
+(sml/setup)
 
 ;; Enable transparency for frames and windows
 (set-frame-parameter (selected-frame) 'alpha '(92 50))
@@ -92,23 +105,39 @@
       use-dialog-box nil
       visible-bell nil)
 
-;; Make powerline active in the minibuffer
-(add-to-list 'load-path "~/.emacs.d/vendor/emacs-powerline")
-(require 'powerline)
+;; Delighted: No clutter - C-h m instead for active minor modes
+(delight '((skewer-mode nil "skewer-mode")
+           (skewer-html-mode nil "skewer-html")
+           (skewer-css-mode nil "skewer-css")
+           (guru-mode nil "guru-mode")
+           (beacon-mode nil "beacon")
+           (prelude-mode nil "prelude-mode")
+           (auto-complete-mode nil "auto-complete")
+           (emmet-mode nil "emmet-mode")
+           (company-mode nil "company")
+           (projectile-mode nil "projectile")
+           (flyspell-mode nil "flyspell")
+           (which-key-mode nil "which-key")
+           (flycheck-mode nil "flycheck")
+           (whitespace-mode nil "whitespace")
+           (smartparens-mode nil "smartparens")
+           (yas-minor-mode nil "yasnippet")
+           (emacs-lisp-mode "EL" :major)))
 
-;; Change powerline color scheme
-(custom-set-faces
- '(mode-line ((t (:foreground "#030303" :background "#bdbdbd" :box nil))))
- '(mode-line-inactive ((t (:foreground "#f9f9f9" :background "#666666" :box nil)))))
+;; Disable guru-mode because arrow keys are often useful
+(setq prelude-guru nil)
 
-;; Use curves in the powerline
-(setq powerline-arrow-shape 'curve)
+;; Enable winner-mode
+(winner-mode 1)
 
 ;; Move default tilde ~ backup files to a backups directory
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
 ;; yes is always y
 (fset 'yes-or-no-p 'y-or-n-p)
+
+;; Enable which-key mode
+(which-key-mode)
 
 ;; Cleanup whitespace before save
 (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -129,6 +158,19 @@
   (unless (and buffer-file-name
                (file-writable-p buffer-file-name))
     (find-alternate-file (concat "/sudo:root@gnutop:" buffer-file-name))))
+
+;; Load yasnippets
+(add-to-list 'load-path
+             "~/.emacs.d/personal/snippets")
+(require 'yasnippet)
+(yas-global-mode 1)
+
+;; Toggle project explorer
+(global-set-key (kbd "C-c SPC") 'project-explorer-toggle)
+
+;; ztree keybindings
+(global-set-key (kbd "C-c z") 'ztree-diff)
+(global-set-key (kbd "C-c Z") 'ztree-dir)
 
 ;; End init file...
 (provide 'rtg-init)
