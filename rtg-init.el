@@ -27,7 +27,6 @@
                             org2blog
                             paredit
                             project-explorer
-                            revive
                             simple-httpd
                             smart-mode-line
                             smart-mode-line-powerline-theme
@@ -36,6 +35,7 @@
                             undo-tree
                             web-beautify
                             which-key
+                            workgroups2
                             yasnippet
                             ztree))
 
@@ -105,22 +105,21 @@
       use-dialog-box nil
       visible-bell nil)
 
-;; Delighted: No clutter - C-h m instead for active minor modes
-(delight '((skewer-mode nil "skewer-mode")
-           (skewer-html-mode nil "skewer-html")
-           (skewer-css-mode nil "skewer-css")
-           (guru-mode nil "guru-mode")
+;; Delighted: no clutter - C-h m instead for active minor modes
+(delight '((auto-complete-mode nil "auto-complete")
            (beacon-mode nil "beacon")
-           (prelude-mode nil "prelude-mode")
-           (auto-complete-mode nil "auto-complete")
-           (emmet-mode nil "emmet-mode")
            (company-mode nil "company")
-           (projectile-mode nil "projectile")
-           (flyspell-mode nil "flyspell")
-           (which-key-mode nil "which-key")
+           (emmet-mode nil "emmet-mode")
            (flycheck-mode nil "flycheck")
-           (whitespace-mode nil "whitespace")
+           (flyspell-mode nil "flyspell")
+           (prelude-mode nil "prelude-mode")
+           (projectile-mode nil "projectile")
            (smartparens-mode nil "smartparens")
+           (skewer-mode nil "skewer-mode")
+           (skewer-css-mode nil "skewer-css")
+           (skewer-html-mode nil "skewer-html")
+           (which-key-mode nil "which-key")
+           (whitespace-mode nil "whitespace")
            (yas-minor-mode nil "yasnippet")
            (emacs-lisp-mode "EL" :major)))
 
@@ -171,6 +170,13 @@
 ;; ztree keybindings
 (global-set-key (kbd "C-c z") 'ztree-diff)
 (global-set-key (kbd "C-c Z") 'ztree-dir)
+
+;; workgroups2 prefix key
+(setq wg-prefix-key (kbd "C-c W"))
+
+;; workgroups2: Emacs exit / workgroups-mode exit
+(setq wg-emacs-exit-save-behavior           'ask)
+(setq wg-workgroups-mode-exit-save-behavior 'ask)
 
 ;; End init file...
 (provide 'rtg-init)
