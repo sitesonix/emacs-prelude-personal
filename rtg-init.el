@@ -24,6 +24,7 @@
                             js2-mode
                             js2-refactor
                             lorem-ipsum
+                            multiple-cursors
                             org2blog
                             paredit
                             project-explorer
@@ -134,6 +135,12 @@
 
 ;; yes is always y
 (fset 'yes-or-no-p 'y-or-n-p)
+
+;; Multiple cursors - keybindings
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 ;; Enable which-key mode
 (which-key-mode)
