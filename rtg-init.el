@@ -94,6 +94,9 @@
 ;; Minibuffer auto-completion
 (icomplete-mode 1)
 
+;; minibuffer evaluations for paredit
+(add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
+
 ;; Set frame title to show filename plus working directory
 (setq uniquify-buffer-name-style 'reverse)
 (setq inhibit-default-init t)
