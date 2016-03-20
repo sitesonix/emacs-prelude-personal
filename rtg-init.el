@@ -40,6 +40,11 @@
                             yasnippet
                             ztree))
 
+;; Use Dvorak while preserving default commands such as C-x on QWERTY keyboard
+(defadvice switch-to-buffer (after activate-input-method activate)
+  (activate-input-method "english-dvorak"))
+(add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
+
 ;; Set the default coding system to UTF-8
 (set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
