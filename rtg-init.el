@@ -3,6 +3,24 @@
 ;;; and editor prefs are found here.  I have two other init files: one for
 ;;; web dev (rtg-web.el) and another for org-mail-other (rtg-org.el).
 ;;; Having these separate keeps my configuration more organized.
+
+;;; License:
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License
+;; as published by the Free Software Foundation; either version 3
+;; of the License, or (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
 ;;; Code:
 
 ;; Require extra packages
@@ -40,7 +58,7 @@
                             yasnippet
                             ztree))
 
-;; Use Dvorak while preserving default commands such as C-x on QWERTY keyboard
+;; Set keyboard layout to Dvorak & preserve default commands such as C-x
 (defadvice switch-to-buffer (after activate-input-method activate)
   (activate-input-method "english-dvorak"))
 (add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
@@ -50,7 +68,7 @@
 (set-default-coding-systems 'utf-8)
 
 ;; Set user details
-(setq user-full-name "Ryan Griffith")
+(setq full-name "Ryan Griffith")
 (setq user-mail-address "ryan@sitesonix.net")
 
 ;; Customize the scratch buffer (for me)
