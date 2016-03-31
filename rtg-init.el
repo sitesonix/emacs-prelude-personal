@@ -1,10 +1,11 @@
 ;;; package --- Summary
+
 ;;; Commentary: Personalized init file for Emacs Prelude -- required
 ;;; packages and basic editor prefs are found here.  I have two other
 ;;; init files: one for web dev (rtg-web.el) and another for
 ;;; org-mail-other (rtg-org.el). Having these separate keeps my
 ;;; configuration more organized.
-;;
+
 ;; Copyright (c) 2016 Ryan Griffith
 ;;
 ;; Author: Ryan Griffith <ryan@sitesonix.net>
@@ -34,6 +35,7 @@
 ;;; Code:
 
 ;;; I. Require extra packages
+
 (prelude-require-packages '(ac-emmet
                             ac-js2
                             apache-mode
@@ -41,12 +43,9 @@
                             autopair
                             company-web
                             ctags
-                            dash
-                            delight
                             dired+
                             elfeed
                             emmet-mode
-                            epl
                             htmlize
                             impatient-mode
                             js2-mode
@@ -57,13 +56,10 @@
                             paredit
                             project-explorer
                             simple-httpd
-                            smart-mode-line
                             smart-mode-line-powerline-theme
                             skewer-mode
                             twittering-mode
-                            undo-tree
                             web-beautify
-                            which-key
                             workgroups2
                             yasnippet
                             ztree))
