@@ -1,8 +1,18 @@
 ;;; package --- Summary
-;;; Commentary: Personalized init file for Emacs Prelude -- required packages
-;;; and editor prefs are found here.  I have two other init files: one for
-;;; web dev (rtg-web.el) and another for org-mail-other (rtg-org.el).
-;;; Having these separate keeps my configuration more organized.
+;;; Commentary: Personalized init file for Emacs Prelude -- required
+;;; packages and basic editor prefs are found here.  I have two other
+;;; init files: one for web dev (rtg-web.el) and another for
+;;; org-mail-other (rtg-org.el). Having these separate keeps my
+;;; configuration more organized.
+;;
+;; Copyright (c) 2016 Ryan Griffith
+;;
+;; Author: Ryan Griffith <ryan@sitesonix.net>
+;; URL: https://sitesonix.net/
+;; Version: 1.0
+;; Keywords: dvorak gtd
+
+;; This file (1 of 3) is not part of GNU Emacs.
 
 ;;; License:
 
@@ -23,7 +33,7 @@
 
 ;;; Code:
 
-;; Require extra packages
+;;; I. Require extra packages
 (prelude-require-packages '(ac-emmet
                             ac-js2
                             apache-mode
@@ -58,14 +68,7 @@
                             yasnippet
                             ztree))
 
-;; Set keyboard layout to Dvorak & preserve default commands such as C-x
-(defadvice switch-to-buffer (after activate-input-method activate)
-  (activate-input-method "english-dvorak"))
-(add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
-
-;; Set the default coding system to UTF-8
-(set-language-environment "UTF-8")
-(set-default-coding-systems 'utf-8)
+;;; II. Basic Editor Preferences
 
 ;; Set user details
 (setq full-name "Ryan Griffith")
@@ -73,12 +76,21 @@
 
 ;; Customize the scratch buffer (for me)
 (setq initial-scratch-message
-    ";; The GNU GPL was not designed to be open source. - RMS\n\n")
+      ";; The GNU GPL was not designed to be open source. - RMS\n\n")
+
+;; Set the default coding system to UTF-8
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+
+;; Set keyboard layout to Dvorak & preserve default commands such as C-x
+(defadvice switch-to-buffer (after activate-input-method activate)
+  (activate-input-method "english-dvorak"))
+(add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
 
 ;; Because I use Emacs built-in customize for themes (custom.el)
 (disable-theme 'zenburn)
 
-;; Enable smart-mode-line and set the theme
+;; Set smart-mode-line theme and enable it (properly)
 (setq sml/theme 'powerline)
 (sml/setup)
 
