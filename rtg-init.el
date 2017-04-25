@@ -34,7 +34,7 @@
 ;; 1. Basic Editor Preferences
 ;; 2. Terminals and Shells
 ;; 3. Theme Preferences
-;; 4. Ibuffer Tweaks
+;; 4. Dired and Ibuffer Tweaks
 ;; 5. Mode Activation/Keybindings
 ;; 6. Org Mode Configuration
 ;; 7. Web Development
@@ -153,13 +153,6 @@
 ;; Cleanup whitespace before save
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
-;; dired: human readable sizes and sort by size
-(setq dired-listing-switches "-alh")
-
-;; Work better with files in different directories
-(require 'find-dired)
-(setq find-ls-option '("-print0 | xargs -0 ls -ld" . "-ld"))
-
 ;; yes is always y
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -208,9 +201,9 @@
     (find-alternate-file (concat "/sudo:root@gnutop:" buffer-file-name))))
 
 ;; Set keyboard layout to Dvorak but preserve QWERTY for commands
-;; (defadvice switch-to-buffer (after activate-input-method activate)
-;;   (activate-input-method "english-dvorak"))
-;; (add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
+ (defadvice switch-to-buffer (after activate-input-method activate)
+   (activate-input-method "english-dvorak"))
+ (add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 3. Theme Preferences @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -239,13 +232,25 @@
 (global-set-key [f5] 'toggle-transparency)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; 4. Ibuffer Preferences @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+;;; 4. Dired and Ibuffer Tweaks @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; dired: human readable sizes and sort by size
+(setq dired-listing-switches "-alh")
+
+;; Work better with files in different directories
+(require 'find-dired)
+(setq find-ls-option '("-print0 | xargs -0 ls -ld" . "-ld"))
 
 ;; Ibuffer: Use Gnus-style grouping for list
 (setq ibuffer-saved-filter-groups
       (quote (("default"
                ("dired" (mode . dired-mode))
+               ("www" (or
+                       (mode . web-mode)
+                       (mode . js-mode)
+                       (mode . js2-mode)
+                       (mode . css-mode)))
                ("org" (or
                            (name . "^\\*Calendar\\*$")
                            (name . "^diary$")
@@ -384,6 +389,9 @@
 ;; Refile: show all headings from all agenda files
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
 
+;; The following org-agenda hacks are borrowed from Sacha Chua's config
+;; http://pages.sachachua.com/.emacs.d/Sacha.html#org6eefca2
+
 ;; Mark TODO as done by simply hitting 'x'
 (defun rtg/org-agenda-done (&optional arg)
   "Mark current TODO as done.
@@ -515,6 +523,8 @@ this with to-do items than with projects or headings."
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'web-mode-hook 'skewer-css-mode)
 (add-hook 'web-mode-hook 'skewer-html-mode)
+
+;; NOTE: Prelude also has good programming language defaults via modules.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 8. Miscellaneous Stuff @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
