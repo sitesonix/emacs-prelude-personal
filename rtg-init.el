@@ -74,7 +74,6 @@
                             skewer-mode
                             twittering-mode
                             web-beautify
-                            yasnippet
                             ztree))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -200,11 +199,6 @@
                (file-writable-p buffer-file-name))
     (find-alternate-file (concat "/sudo:root@gnutop:" buffer-file-name))))
 
-;; Set keyboard layout to Dvorak but preserve QWERTY for commands
- (defadvice switch-to-buffer (after activate-input-method activate)
-   (activate-input-method "english-dvorak"))
- (add-hook 'minibuffer-setup-hook (lambda () (set-input-method "english-dvorak")))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; 3. Theme Preferences @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -255,12 +249,6 @@
                            (name . "^\\*Calendar\\*$")
                            (name . "^diary$")
                            (mode . org-mode)))
-               ("emacs" (or
-                         (name . "^\\*scratch\\*$")
-                         (name . "^\\*Messages\\*$")))
-               ("eww" (or
-                         (mode . eww-mode)
-                         (mode . eww-bookmark-mode)))
                ("gnus" (or
                         (mode . message-mode)
                         (mode . bbdb-mode)
@@ -269,7 +257,13 @@
                         (mode . gnus-summary-mode)
                         (mode . gnus-article-mode)
                         (name . "^\\.bbdb$")
-                        (name . "^\\.newsrc-dribble")))))))
+                        (name . "^\\.newsrc-dribble")))
+               ("eww" (or
+                       (mode . eww-mode)
+                       (mode . eww-bookmark-mode)))
+               ("emacs" (or
+                         (name . "^\\*scratch\\*$")
+                         (name . "^\\*Messages\\*$")))))))
 
 (add-hook 'ibuffer-mode-hook
           (lambda ()
@@ -361,6 +355,14 @@
         ("n" todo "NEXT" nil)
         ("d" "Agenda + Next Actions" ((agenda) (todo "NEXT"))))
       )
+
+;; function to capture a todo
+(defun rtg/org-capture-todo ()
+  (interactive)
+  "Capture a TODO item"
+  (org-capture nil "t"))
+;; bind
+(define-key global-map (kbd "C-7") 'rtg/org-capture-todo)
 
 ;; Interactive gtd file
 (defun gtd ()
@@ -468,9 +470,12 @@ this with to-do items than with projects or headings."
 ;; yasnippet should be loaded before auto complete so that they can work together
 ;; Load yasnippets
 (add-to-list 'load-path
-             "~/.emacs.d/personal/snippets")
+             "~/.emacs.d/plugins/yasnippet")
 (require 'yasnippet)
 (yas-global-mode 1)
+
+;; yasnippet expansion and completion with dropdown
+(setq yas-prompt-functions '(yas-x-prompt yas-dropdown-prompt))
 
 ;; Auto-complete
 (require 'auto-complete)
@@ -563,6 +568,24 @@ this with to-do items than with projects or headings."
            (whitespace-mode nil "whitespace")
            (yas-minor-mode nil "yasnippet")
            (emacs-lisp-mode "EL" :major)))
+
+;; BBDB: Allow for adding birthdays to records
+(defadvice bbdb-read-new-record (after wicked activate)
+  "Prompt for the birthdate as well."
+  (bbdb-record-putprop ad-return-value 'birthdate
+                       (bbdb-read-string "Birthdate (YYYY.MM.DD): ")))
+
+;; Browsing choices: EWW or Firefox
+(defalias 'gk-urls-external-browser 'browse-url-xdg-open)
+(defun gk-browse-url (&rest args)
+  "Prompt for whether or not to browse with EWW, if no browse
+with external browser."
+  (apply
+   (if (y-or-n-p "Browse with EWW? ")
+       'eww-browse-url
+     'gk-urls-external-browser)
+   args))
+(setq browse-url-browser-function #'gk-browse-url)
 
 ;; End init file...
 (provide 'rtg-init)
