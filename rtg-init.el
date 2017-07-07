@@ -125,6 +125,13 @@
 (global-set-key (kbd "C-z <right>") 'windmove-right)
 ;; where S <left/right/up/down> still works outside org
 
+;; Enable ivy mode completion everywhere
+(ivy-mode 1)
+
+;; Basic ivy settings
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
+
 ;; Smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 
@@ -290,13 +297,6 @@
 ;; 5. Mode Specific (general) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Enable ivy mode completion everywhere
-(ivy-mode 1)
-
-;; Basic ivy settings
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
-
 ;; Disable guru-mode because arrow keys are sometimes useful
 (setq prelude-guru nil)
 
@@ -327,14 +327,13 @@
 ;; 6. Org-mode Setup @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Extra org modules and export backends
-(setq org-modules '(org-bbdb
-                    org-gnus))
-(eval-after-load 'org
-  '(org-load-modules-maybe t))
-
-;; Prepare stuff for org-export-backends
-(setq org-export-backends '(org latex html ascii))
+;; First ensure that auto fill mode is an always option for org other text docs
+(add-hook 'text-mode-hook
+          (lambda ()
+            (when (y-or-n-p "Auto Fill mode? ")
+              (turn-on-auto-fill))))
+;; and set the keybinding
+(global-set-key (kbd "C-c q") 'auto-fill-mode)
 
 ;; Setup org mode agenda
 (add-to-list 'load-path "~/emacs/org")
@@ -349,6 +348,12 @@
       (list "~/org/gtd.org"
             "~/org/work.org"
             "~/org/personal.org"))
+
+;; Interactive gtd file
+(defun gtd ()
+  (interactive)
+  (find-file "~/org/gtd.org")
+  )
 
 ;; Set return to activate a link
 (setq org-return-follows-link t)
@@ -368,16 +373,6 @@
 ;; bind
 (define-key global-map (kbd "C-7") 'rtg/org-capture-todo)
 
-;; Interactive gtd file
-(defun gtd ()
-  (interactive)
-  (find-file "~/org/gtd.org")
-  )
-
-;; Use ido for org completion
-(ido-mode)
-(setq org-completion-use-ido t)
-
 ;; Org-projectile for per-repo TODO files
 (require 'org-projectile)
 (org-projectile:per-repo)
@@ -386,17 +381,26 @@
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c n p") 'org-projectile:project-todo-completing-read)
 
-;; Org-capture keybinding
-(global-set-key (kbd "C-c c") 'org-capture)
-
 ;; Org-capture to personal.org file
 (setq org-default-notes-file "~/org/personal.org")
+;; Org-capture keybinding
+(global-set-key (kbd "C-c c") 'org-capture)
 
 ;; Refile: show all headings from all agenda files
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
 
+;; Extra org modules and export backends
+(setq org-modules '(org-bbdb
+                    org-gnus))
+(eval-after-load 'org
+  '(org-load-modules-maybe t))
+
+;; Prepare stuff for org-export-backends
+(setq org-export-backends '(org latex html ascii))
+
 ;; The following org-agenda hacks are borrowed from Sacha Chua's config
 ;; http://pages.sachachua.com/.emacs.d/Sacha.html#org6eefca2
+;; What I was trying to do was already out there. :-)
 
 ;; Mark TODO as done by simply hitting 'x'
 (defun rtg/org-agenda-done (&optional arg)
