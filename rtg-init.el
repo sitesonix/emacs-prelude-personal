@@ -125,9 +125,6 @@
 (global-set-key (kbd "C-z <right>") 'windmove-right)
 ;; where S <left/right/up/down> still works outside org
 
-;; Minibuffer auto-completion
-(icomplete-mode 1)
-
 ;; Smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 
@@ -292,6 +289,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 5. Mode Specific (general) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Enable ivy mode completion everywhere
+(ivy-mode 1)
+
+;; Basic ivy settings
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
 
 ;; Disable guru-mode because arrow keys are sometimes useful
 (setq prelude-guru nil)
