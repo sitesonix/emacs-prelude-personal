@@ -60,11 +60,13 @@
                             gnus-desktop-notify
                             htmlize
                             impatient-mode
+                            ivy
                             js2-mode
                             js2-refactor
                             lorem-ipsum
                             multi-term
                             multiple-cursors
+                            olivetti
                             org2blog
                             org-password-manager
                             org-projectile
@@ -124,13 +126,6 @@
 (global-set-key (kbd "C-z <up>") 'windmove-up)
 (global-set-key (kbd "C-z <right>") 'windmove-right)
 ;; where S <left/right/up/down> still works outside org
-
-;; Enable ivy mode completion everywhere
-(ivy-mode 1)
-
-;; Basic ivy settings
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
 
 ;; Smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
@@ -297,6 +292,13 @@
 ;; 5. Mode Specific (general) @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Enable ivy mode completion everywhere
+(ivy-mode 1)
+
+;; Basic ivy settings
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
+
 ;; Disable guru-mode because arrow keys are sometimes useful
 (setq prelude-guru nil)
 
@@ -327,13 +329,14 @@
 ;; 6. Org-mode Setup @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; First ensure that auto fill mode is an always option for org other text docs
+;; First to ensure that auto fill mode is an option for org other text docs
 (add-hook 'text-mode-hook
           (lambda ()
             (when (y-or-n-p "Auto Fill mode? ")
               (turn-on-auto-fill))))
 ;; and set the keybinding
 (global-set-key (kbd "C-c q") 'auto-fill-mode)
+;; otherwise set visual-line-mode or olivetti for distraction-free writing
 
 ;; Setup org mode agenda
 (add-to-list 'load-path "~/emacs/org")
@@ -400,7 +403,7 @@
 
 ;; The following org-agenda hacks are borrowed from Sacha Chua's config
 ;; http://pages.sachachua.com/.emacs.d/Sacha.html#org6eefca2
-;; What I was trying to do was already out there. :-)
+;; What I trying to do was already out there. :-)
 
 ;; Mark TODO as done by simply hitting 'x'
 (defun rtg/org-agenda-done (&optional arg)
