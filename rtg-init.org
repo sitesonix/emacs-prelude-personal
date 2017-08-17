@@ -11,7 +11,7 @@
  "Tangles rtg-init.org and byte compiles ~/.emacs.d/personal"
    (interactive)
    (when (equal (buffer-name)
-                (concat "emacs.org"))
+                (concat "rtg-init.org"))
      (org-babel-tangle)
      (byte-recompile-directory (expand-file-name user-emacs-directory) 0)))
 
