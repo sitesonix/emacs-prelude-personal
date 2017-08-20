@@ -19,13 +19,6 @@
 (add-hook 'kill-emacs-hook #'my--tangle-byte-compile-org)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle yes
-   :PROPERTIES:
-   :CUSTOM_ID: babel-init
-   :END:
-<<babel-init>>
-#+END_SRC
-
 ** 01. Intro & Commentary
 
 #+BEGIN_SRC emacs-lisp :tangle yes
