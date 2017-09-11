@@ -1,25 +1,10 @@
-#+TITLE: Sitesonix Emacs Config
-#+PROPERTY: header-args :tangle ~/.emacs.d/personal/rtg-init.el
+#+TITLE: Sitesonix Emacs Configuration
+#+OPTIONS: toc:4 h:4
 #+STARTUP: hideall
 
-* CONFIGURATION
+* Configuration
 
-** 00. About This File
-#+BEGIN_SRC emacs-lisp :tangle yes
-;; Start tangling...
-(defun my--tangle-byte-compile-org ()
- "Tangles rtg-init.org and byte compiles ~/.emacs.d/personal"
-   (interactive)
-   (when (equal (buffer-name)
-                (concat "rtg-init.org"))
-     (org-babel-tangle)
-     (byte-recompile-directory (expand-file-name user-emacs-directory) 0)))
-
-(add-hook 'after-save-hook #'my--tangle-byte-compile-org)
-(add-hook 'kill-emacs-hook #'my--tangle-byte-compile-org)
-#+END_SRC
-
-** 01. Intro & Commentary
+** 01. Introduction
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 ;;; package --- Summary
@@ -31,7 +16,7 @@
 ;; Author: Ryan Griffith <ryan@sitesonix.net>
 ;; URL: https://sitesonix.net/
 ;; Version: 1.2
-;; Keywords: dvorak web gtd
+;; Keywords: org gtd web
 
 ;; This file is not a part of GNU Emacs.
 
@@ -54,8 +39,7 @@
 
 ;;; Sections:
 
-;; 00. About This File
-;; 01. Intro & Commentary
+;; 01. Introduction
 ;; 02. Prelude Require Packages
 ;; 03. Basic Editor Preferences
 ;; 04. Terminals and Shells
@@ -70,6 +54,8 @@
 
 ** 02. Prelude Require Packages
 
+Prelude's require package section.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
 (prelude-require-packages '(ac-emmet
                             ac-js2
@@ -77,6 +63,7 @@
                             auto-complete
                             autopair
                             bbdb
+                            bookmark+
                             company-web
                             ctags
                             dired+
@@ -106,38 +93,44 @@
 
 ** 03. Basic Editor Preferences
 
+Set my user details.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Set user details
 (setq full-name "Ryan Griffith")
 (setq user-mail-address "ryan@sitesonix.net")
 #+END_SRC
 
+Customize the scratch buffer (for me).
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Customize the scratch buffer (for me)
 (setq initial-scratch-message
       ";; The GNU GPL was not designed to be open source. - RMS\n\n")
 #+END_SRC
 
+Set the default coding system to UTF-8.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Set the default coding system to UTF-8
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 #+END_SRC
 
+Set a reasonable default font size.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Set the font size
 (set-face-attribute 'default nil :height 100)
 #+END_SRC
 
+I like cursor blinking enabled because I can find it more easily.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable cursor blinking. I actually love this though others hate it.
 (blink-cursor-mode t)
 #+END_SRC
 
+Use modeline flash as a visible bell.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Use modeline flash as a visible bell
 (defun rtg/flash-mode-line ()
   (invert-face 'mode-line)
   (run-with-timer 0.05 nil 'invert-face 'mode-line))
@@ -145,17 +138,21 @@
  ring-bell-function 'rtg/flash-mode-line)
 #+END_SRC
 
+The scroll bar isn't necessary.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; The scroll bar isn't necessary
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 #+END_SRC
 
+Display the date and time in the mode line.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Display date and time in the mode line
 (setq display-time-day-and-date t
       display-time-12hr-format t)
 (display-time)
 #+END_SRC
+
+Windmove for org-mode settings.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 ;; Redefine the default Emacs suspend keybinding...
@@ -169,18 +166,23 @@
 ;; where S <left/right/up/down> still works outside org
 #+END_SRC
 
+Smart tab behavior: indent or complete?
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Smart tab behavior - indent or complete
 (setq tab-always-indent 'complete)
 #+END_SRC
 
+Certainly nice to have minibuffer evaluations for paredit.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; minibuffer evaluations for paredit
 (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
 #+END_SRC
 
+Set the frame title to show filename plus working directory. I generally
+hide the title bar via GNOME Shell plugin on my machines, but it shows up if
+I'm using my config on another system. Might as well show something useful.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Set frame title to show filename plus working directory
 (setq uniquify-buffer-name-style 'reverse)
 (setq inhibit-default-init t)
 (setq-default frame-title-format "%b (%f)")
@@ -188,42 +190,51 @@
 (global-set-key "\M-p" "\C-u1\M-v")
 #+END_SRC
 
+Some mods and tweaks in the echo area:
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Mods and tweaks in the echo area
 (setq echo-keystrokes 0.1
       use-dialog-box nil
       visible-bell nil)
 #+END_SRC
 
+I do not like clutter in my working directories. So, I choose
+to bounce the ~ backup files into their own directory.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Move default tilde ~ backup files to a backups directory
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 #+END_SRC
 
+In general, I think it's best to cleanup whitespace before save.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Cleanup whitespace before save
 (add-hook 'before-save-hook 'whitespace-cleanup)
 #+END_SRC
 
+In my world, yes should always be y.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; yes is always y
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
+For the sake of completeness I like to add a new line at the end of
+a given file.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Add a new line at the end of a file
 (setq require-final-newline t)
 #+END_SRC
 
 ** 04. Terminals and Shells
 
+Setup bash for use with multi-term.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Setup bash for use with multi-term
 (setq multi-term-program "/bin/bash")
 #+END_SRC
 
+Setup multi-term for practical use.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Setup multi-term for practical use
 (when (require 'multi-term nil t)
   (global-set-key (kbd "C-x t") 'multi-term)
   (global-set-key (kbd "<C-next>") 'multi-term-next)
@@ -232,8 +243,9 @@
         multi-term-program "/bin/bash"))
 #+END_SRC
 
+Declare multi-term keybindings.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Multi-term keybindings
 (when (require 'term nil t) ; only if term can be loaded..
   (setq term-bind-key-alist
         (list (cons "C-c C-c" 'term-interrupt-subjob)
@@ -253,10 +265,11 @@
               (cons "C-y" 'term-send-raw))))
 #+END_SRC
 
+Prompt for password and then open files owned by root.
+Not sure where else to put this. Still use but switching
+to ivy, swiper and counsel. But hey it still works for now.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Prompt for password and then open files owned by root
-;; Not sure where else to put this. Still use but switching
-;; to ivy, swiper and counsel. But hey it works.
 (defadvice ido-find-file (after find-file-sudo activate)
   "Find file as root if necessary."
   (unless (and buffer-file-name
@@ -266,14 +279,16 @@
 
 ** 05. Theme Preferences
 
+I use Emacs built-in customize for themes. Usually the sanityinc tomorrow
+night theme but not always.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Because I use Emacs built-in customize for themes
-;; (usually the sanityinc tomorrow night theme but not always...)
 (disable-theme 'zenburn)
 #+END_SRC
 
+Enable transparency for frames and windows.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable transparency for frames and windows
 (set-frame-parameter (selected-frame) 'alpha '(92 50))
 (add-to-list 'default-frame-alist '(alpha 92 50))
 (eval-when-compile (require 'cl))
@@ -294,19 +309,22 @@
 
 ** 06. Dired & Ibuffer Tweaks
 
+dired: Human readable sizes and sort by size.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; dired: human readable sizes and sort by size
 (setq dired-listing-switches "-alh")
 #+END_SRC
 
+dired: Work better with files in different directories.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Work better with files in different directories
 (require 'find-dired)
 (setq find-ls-option '("-print0 | xargs -0 ls -ld" . "-ld"))
 #+END_SRC
 
+Ibuffer: Use Gnus-style grouping for list.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Ibuffer: Use Gnus-style grouping for list
 (setq ibuffer-saved-filter-groups
       (quote (("default"
                ("dired" (mode . dired-mode))
@@ -340,8 +358,9 @@
             (ibuffer-switch-to-saved-filter-groups "default")))
 #+END_SRC
 
+Ibuffer: Use human readable size column instead of original one.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Ibuffer: use human readable Size column instead of original one
 (define-ibuffer-column size-h
   (:name "Size" :inline t)
   (cond
@@ -351,8 +370,9 @@
    (t (format "%8d" (buffer-size)))))
 #+END_SRC
 
+Ibuffer: Modify the default ibuffer-formats.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Modify the default ibuffer-formats
 (setq ibuffer-formats
       '((mark modified read-only " "
               (name 18 18 :left :elide)
@@ -366,51 +386,60 @@
 
 ** 07. Mode Specific (General)
 
+Enable ivy mode completion everywhere.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable ivy mode completion everywhere
 (ivy-mode 1)
 #+END_SRC
 
+Basic ivy settings.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Basic ivy settings
 (setq ivy-use-virtual-buffers t)
 (setq ivy-count-format "(%d/%d) ")
 #+END_SRC
 
+Disable guru-mode because arrow keys are sometimes useful.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Disable guru-mode because arrow keys are sometimes useful
 (setq prelude-guru nil)
 #+END_SRC
 
+Enable winner-mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable winner-mode
 (winner-mode 1)
 #+END_SRC
 
+Enable which-key mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable which-key mode
 (which-key-mode)
 #+END_SRC
 
+Enable undo-tree-mode visualization with C-x u.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable undo-tree-mode visualization with C-x u
 (global-undo-tree-mode)
 #+END_SRC
 
+Enable toggle for project explorer.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable toggle for project explorer
 (global-set-key (kbd "C-c SPC") 'project-explorer-toggle)
 ;; NOTE: when outside of a project I like to use the built-in M-x speedbar
 #+END_SRC
 
+Enable and set ztree keybindings.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable and set ztree keybindings
 (global-set-key (kbd "C-c z") 'ztree-diff)
 (global-set-key (kbd "C-c Z") 'ztree-dir)
 #+END_SRC
 
+Enable and set multiple cursors keybindings
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable and set multiple cursors keybindings
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
@@ -419,8 +448,27 @@
 
 ** 08. Org-mode Setup
 
+Main files are found here. Add new project files to the list as needed.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; First to ensure that auto fill mode is an option for org other text docs
+(setq org-agenda-files
+      (list "~/org/gtd.org"
+            "~/org/work.org"
+            "~/org/personal.org"))
+#+END_SRC
+
+Set the interactive gtd file.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun gtd ()
+  (interactive)
+  (find-file "~/org/gtd.org")
+  )
+#+END_SRC
+
+Ensure that auto fill mode is an option for org and other text docs.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-hook 'text-mode-hook
           (lambda ()
             (when (y-or-n-p "Auto Fill mode? ")
@@ -430,8 +478,9 @@
 ;; otherwise set visual-line-mode or olivetti for distraction-free writing
 #+END_SRC
 
+Setup org mode agenda.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Setup org mode agenda
 (add-to-list 'load-path "~/emacs/org")
 (require 'org)
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
@@ -440,29 +489,9 @@
 (setq org-log-done t)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle yes
-;; Main files are found here. Add new project files to the list as needed
-(setq org-agenda-files
-      (list "~/org/gtd.org"
-            "~/org/work.org"
-            "~/org/personal.org"))
-#+END_SRC
+Custom org-agenda commands.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Interactive gtd file
-(defun gtd ()
-  (interactive)
-  (find-file "~/org/gtd.org")
-  )
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-;; Set return to activate a link
-(setq org-return-follows-link t)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-;; Custom org-agenda commands
 (setq org-agenda-custom-commands
       '(("w" todo "WAITING" nil)
         ("n" todo "NEXT" nil)
@@ -470,8 +499,9 @@
       )
 #+END_SRC
 
+Function to capture a todo.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; function to capture a todo
 (defun rtg/org-capture-todo ()
   (interactive)
   "Capture a TODO item"
@@ -490,39 +520,49 @@
 ;; (global-set-key (kbd "C-c n p") 'org-projectile:project-todo-completing-read)
 #+END_SRC
 
+Org-capture to my personal.org file.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Org-capture to personal.org file
 (setq org-default-notes-file "~/org/personal.org")
 ;; Org-capture keybinding
 (global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
 
+Refile: show all headings from all agenda files.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Refile: show all headings from all agenda files
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
 #+END_SRC
 
+Set return to activate a link.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Extra org modules and export backends
+(setq org-return-follows-link t)
+#+END_SRC
+
+Extra org modules and export backends.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
 (setq org-modules '(org-bbdb
                     org-gnus))
 (eval-after-load 'org
   '(org-load-modules-maybe t))
 #+END_SRC
 
+Prepare stuff for org-export-backends.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Prepare stuff for org-export-backends
 (setq org-export-backends '(org latex html ascii))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :tangle yes
-;; The following org-agenda hacks are borrowed from Sacha Chua's config
-;; http://pages.sachachua.com/.emacs.d/Sacha.html#org6eefca2
-;; What I was trying to do was already out there. :-)
-#+END_SRC
+
+The following org-agenda hacks are borrowed from Sacha Chua's config
+http://pages.sachachua.com/.emacs.d/Sacha.html#org6eefca2
+What I was trying to do was already out there. :-)
+
+Mark TODO as done by simply hitting 'x'.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Mark TODO as done by simply hitting 'x'
 (defun rtg/org-agenda-done (&optional arg)
   "Mark current TODO as done.
 This changes the line at point, all other lines in the agenda referring to
@@ -533,8 +573,9 @@ the same tree node, and the headline of the tree node in the Org-mode file."
 (define-key org-agenda-mode-map "x" 'rtg/org-agenda-done)
 #+END_SRC
 
+Mark TODO as done with 'X' and then create new task at same level.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Mark TODO as done with 'X' and then create new task at same level
 (defun rtg/org-agenda-mark-done-and-add-followup ()
   "Mark the current TODO as done and add another task after it.
 Creates it at the same level as the previous task, so it's better to use
@@ -547,8 +588,9 @@ this with to-do items than with projects or headings."
 (define-key org-agenda-mode-map "X" 'rtg/org-agenda-mark-done-and-add-followup)
 #+END_SRC
 
+Capture something based on the agenda.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Capture something based on the agenda
 (defun rtg/org-agenda-new ()
   "Create a new note or task at the current agenda item.
 Creates it at the same level as the previous task, so it's better to use
@@ -560,8 +602,9 @@ this with to-do items than with projects or headings."
 (define-key org-agenda-mode-map "N" 'rtg/org-agenda-new)
 #+END_SRC
 
+Keep track of unscheduled tasks and stuck projects.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Keep track of unscheduled tasks and stuck projects
 (defun rtg/org-agenda-list-unscheduled (&rest ignore)
   "Create agenda view for tasks that are unscheduled and not done."
   (let* ((org-agenda-todo-ignore-with-date t)
@@ -576,19 +619,22 @@ this with to-do items than with projects or headings."
 
 ** 09. Web Development
 
+Align code in a pretty way.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Align code in a pretty way
 (global-set-key (kbd "C-x \\") #'align-regexp)
 #+END_SRC
 
+Enable emmet for web mode and css mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Enable emmet for web mode and css mode
 (add-hook 'web-mode-hook 'emmet-mode)
 (add-hook 'css-mode-hook  'emmet-mode)
 #+END_SRC
 
+Get company-mode to work with web-mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Get company-mode to work with web-mode
 (eval-after-load 'company-etags
   '(progn
      (add-to-list 'company-etags-modes 'web-mode)))
@@ -598,38 +644,44 @@ this with to-do items than with projects or headings."
 (eval-after-load 'web-mode '(define-key web-mode-map (kbd "s-d") 'php-jump))
 #+END_SRC
 
+Set default mode for Javascript files.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Set default mode for Javascript files
 (add-to-list 'auto-mode-alist '("\\.js" . js-mode))
 #+END_SRC
 
+Set default mode for JSON files.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Set default mode for JSON files
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 #+END_SRC
 
+Add hooks for js2 mode and auto-complete.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Add hooks for JS2 mode and auto-complete
 (add-hook 'js-mode-hook 'js2-minor-mode)
 (add-hook 'js2-mode-hook 'ac-js2-mode)
 #+END_SRC
 
+yasnippet should be loaded before auto complete so that they can work together.
+Load yasnippets:
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; yasnippet should be loaded before auto complete so that they can work together
-;; Load yasnippets
 (add-to-list 'load-path
              "~/.emacs.d/plugins/yasnippet")
 (require 'yasnippet)
 (yas-global-mode 1)
 #+END_SRC
 
+yasnippet expansion and completion with dropdown.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; yasnippet expansion and completion with dropdown
 (setq yas-prompt-functions '(yas-x-prompt yas-dropdown-prompt))
 #+END_SRC
 
+Auto-complete.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Auto-complete
 (require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
@@ -647,16 +699,18 @@ this with to-do items than with projects or headings."
 (ac-config-default)
 #+END_SRC
 
+Set the trigger key so that it can work together with yasnippet on tab key.
+If the word exists in yasnippet, pressing tab will cause yasnippet to
+activate, otherwise, auto-complete will.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;;; set the trigger key so that it can work together with yasnippet on tab key,
-;;; if the word exists in yasnippet, pressing tab will cause yasnippet to
-;;; activate, otherwise, auto-complete will
 (ac-set-trigger-key "TAB")
 (ac-set-trigger-key "<tab>")
 #+END_SRC
 
+Require web-mode for mixed templates with HTML, CSS and PHP.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Require web-mode for mixed templates with HTML, CSS and PHP
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
@@ -666,13 +720,15 @@ this with to-do items than with projects or headings."
             '("/\\(views\\|html\\|theme\\|templates\\)/.*\\.php\\'" . web-mode))
 #+END_SRC
 
+Make web-mode play nice with smartparens.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; make web-mode play nice with smartparens
 (setq web-mode-enable-auto-pairing nil)
 #+END_SRC
 
+Require auto-complete for web-mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Require auto-complete for web-mode
 (require 'auto-complete)
 (require 'auto-complete-config)
 (ac-config-default)
@@ -683,14 +739,16 @@ this with to-do items than with projects or headings."
 (global-set-key (kbd "C-<tab>") 'auto-complete)
 #+END_SRC
 
+Require impatient mode to start after invoking simple httpd mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Require impatient mode to start after invoking simple httpd mode
 (add-to-list 'load-path "~/.emacs.d/impatient-mode")
 (require 'impatient-mode)
 #+END_SRC
 
+Add hooks for skewer mode.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Add hooks for skewer mode
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'web-mode-hook 'skewer-css-mode)
 (add-hook 'web-mode-hook 'skewer-html-mode)
@@ -698,8 +756,9 @@ this with to-do items than with projects or headings."
 
 ** 10. Miscellaneous Stuff
 
+Hippie expand is dabbrev expand on steroids.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Hippie expand is dabbrev expand on steroids
 (setq hippie-expand-try-functions-list '(try-expand-dabbrev
                                          try-expand-dabbrev-all-buffers
                                          try-expand-dabbrev-from-kill
@@ -712,14 +771,16 @@ this with to-do items than with projects or headings."
                                          try-complete-lisp-symbol))
 #+END_SRC
 
+Use hippie-expand instead of dabbrev.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Use hippie-expand instead of dabbrev
 (global-set-key (kbd "M-/") #'hippie-expand)
 (global-set-key (kbd "s-/") #'hippie-expand)
 #+END_SRC
 
+Delighted: no clutter - C-h m instead for active minor modes.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Delighted: no clutter - C-h m instead for active minor modes
 (delight '((auto-complete-mode nil "auto-complete")
            (beacon-mode nil "beacon")
            (company-mode nil "company")
@@ -738,16 +799,18 @@ this with to-do items than with projects or headings."
            (emacs-lisp-mode "EL" :major)))
 #+END_SRC
 
+BBDB: Allow for adding birthdays to records.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; BBDB: Allow for adding birthdays to records
 (defadvice bbdb-read-new-record (after wicked activate)
   "Prompt for the birthdate as well."
   (bbdb-record-putprop ad-return-value 'birthdate
                        (bbdb-read-string "Birthdate (YYYY.MM.DD): ")))
 #+END_SRC
 
+Browsing choices: EWW or Firefox.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
-;; Browsing choices: EWW or Firefox
 (defalias 'gk-urls-external-browser 'browse-url-xdg-open)
 (defun gk-browse-url (&rest args)
   "Prompt for whether or not to browse with EWW, if no browse
@@ -758,6 +821,17 @@ with external browser."
      'gk-urls-external-browser)
    args))
 (setq browse-url-browser-function #'gk-browse-url)
+#+END_SRC
+
+Allow for the generation of multiple eww buffers.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun eww-new ()
+  (interactive)
+  (let ((url (read-from-minibuffer "Enter URL or keywords: ")))
+    (switch-to-buffer (generate-new-buffer "eww"))
+    (eww-mode)
+    (eww url)))
 #+END_SRC
 
 ** 11. Close Init
