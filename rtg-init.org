@@ -1,5 +1,4 @@
 #+TITLE: Sitesonix Emacs Configuration
-#+OPTIONS: toc:4 h:4
 #+STARTUP: hideall
 
 * Configuration
@@ -15,7 +14,7 @@
 ;;
 ;; Author: Ryan Griffith <ryan@sitesonix.net>
 ;; URL: https://sitesonix.net/
-;; Version: 1.2
+;; Version: 2.0
 ;; Keywords: org gtd web
 
 ;; This file is not a part of GNU Emacs.
@@ -68,8 +67,7 @@ Prelude's require package section.
                             ctags
                             dired+
                             emmet-mode
-                            gnome-calendar
-                            gnus-desktop-notify
+                            flymd
                             htmlize
                             impatient-mode
                             ivy
@@ -100,7 +98,7 @@ Set my user details.
 (setq user-mail-address "ryan@sitesonix.net")
 #+END_SRC
 
-Customize the scratch buffer (for me).
+Customize the scratch buffer.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 (setq initial-scratch-message
@@ -152,7 +150,15 @@ Display the date and time in the mode line.
 (display-time)
 #+END_SRC
 
-Windmove for org-mode settings.
+Insert the date and time.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun put-date ()
+  (interactive)
+  (insert (shell-command-to-string "date")))
+#+END_SRC
+
+Windmove for org-mode is C-z left, right, up or down.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 ;; Redefine the default Emacs suspend keybinding...
@@ -208,7 +214,8 @@ to bounce the ~ backup files into their own directory.
 In general, I think it's best to cleanup whitespace before save.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-(add-hook 'before-save-hook 'whitespace-cleanup)
+;; disabled for the time being. Conflicts to resolve.
+;; (add-hook 'before-save-hook 'whitespace-cleanup)
 #+END_SRC
 
 In my world, yes should always be y.
@@ -417,6 +424,12 @@ Enable which-key mode.
 (which-key-mode)
 #+END_SRC
 
+Disable Prelude white space (for now).
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq prelude-whitespace nil)
+#+END_SRC
+
 Enable undo-tree-mode visualization with C-x u.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -464,18 +477,6 @@ Set the interactive gtd file.
   (interactive)
   (find-file "~/org/gtd.org")
   )
-#+END_SRC
-
-Ensure that auto fill mode is an option for org and other text docs.
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-(add-hook 'text-mode-hook
-          (lambda ()
-            (when (y-or-n-p "Auto Fill mode? ")
-              (turn-on-auto-fill))))
-;; and set the keybinding
-(global-set-key (kbd "C-c q") 'auto-fill-mode)
-;; otherwise set visual-line-mode or olivetti for distraction-free writing
 #+END_SRC
 
 Setup org mode agenda.

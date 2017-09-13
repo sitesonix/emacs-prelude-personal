@@ -6,7 +6,7 @@
 ;;
 ;; Author: Ryan Griffith <ryan@sitesonix.net>
 ;; URL: https://sitesonix.net/
-;; Version: 1.2
+;; Version: 2.0
 ;; Keywords: org gtd web
 
 ;; This file is not a part of GNU Emacs.
@@ -48,12 +48,12 @@
                             auto-complete
                             autopair
                             bbdb
+                            bookmark+
                             company-web
                             ctags
                             dired+
                             emmet-mode
-                            gnome-calendar
-                            gnus-desktop-notify
+                            flymd
                             htmlize
                             impatient-mode
                             ivy
@@ -101,6 +101,10 @@
       display-time-12hr-format t)
 (display-time)
 
+(defun put-date ()
+  (interactive)
+  (insert (shell-command-to-string "date")))
+
 ;; Redefine the default Emacs suspend keybinding...
 (global-unset-key (kbd "C-z")) ; windmove prefix
 (global-set-key (kbd "C-z C-z") 'suspend-frame)
@@ -127,7 +131,8 @@
 
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
-(add-hook 'before-save-hook 'whitespace-cleanup)
+;; disabled for the time being. Conflicts to resolve.
+;; (add-hook 'before-save-hook 'whitespace-cleanup)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -251,6 +256,8 @@
 
 (which-key-mode)
 
+(setq prelude-whitespace nil)
+
 (global-undo-tree-mode)
 
 (global-set-key (kbd "C-c SPC") 'project-explorer-toggle)
@@ -273,14 +280,6 @@
   (interactive)
   (find-file "~/org/gtd.org")
   )
-
-(add-hook 'text-mode-hook
-          (lambda ()
-            (when (y-or-n-p "Auto Fill mode? ")
-              (turn-on-auto-fill))))
-;; and set the keybinding
-(global-set-key (kbd "C-c q") 'auto-fill-mode)
-;; otherwise set visual-line-mode or olivetti for distraction-free writing
 
 (add-to-list 'load-path "~/emacs/org")
 (require 'org)
