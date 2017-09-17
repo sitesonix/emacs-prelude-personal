@@ -77,8 +77,28 @@
 (setq full-name "Ryan Griffith")
 (setq user-mail-address "ryan@sitesonix.net")
 
-(setq initial-scratch-message
-      ";; The GNU GPL was not designed to be open source. - RMS\n\n")
+(defun my-fortune-scratch-message ()
+  (interactive)
+  (let ((fortune
+         (when (executable-find "fortune")
+           (with-temp-buffer
+             (shell-command "fortune" t)
+             (let ((comment-start ";;"))
+               (comment-region (point-min) (point-max)))
+             (delete-trailing-whitespace (point-min) (point-max))
+             (concat (buffer-string) "\n")))))
+    (if (called-interactively-p 'any)
+        (insert fortune)
+      fortune)))
+
+;; initial-scratch-message
+(let ((fortune (my-fortune-scratch-message)))
+  (when fortune
+    (setq initial-scratch-message fortune)))
+
+;; Previous scratch buffer
+;; (setq initial-scratch-message
+;;       ";; The GNU GPL was not designed to be open source. - RMS\n\n")
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
