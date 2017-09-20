@@ -64,6 +64,7 @@ Prelude's require package section.
                             bbdb
                             bookmark+
                             company-web
+                            counsel
                             ctags
                             dired+
                             emmet-mode
@@ -84,6 +85,7 @@ Prelude's require package section.
                             project-explorer
                             simple-httpd
                             skewer-mode
+                            swiper
                             twittering-mode
                             web-beautify
                             ztree))
@@ -413,17 +415,16 @@ Ibuffer: Modify the default ibuffer-formats.
 
 ** 07. Mode Specific (General)
 
-Enable ivy mode completion everywhere.
+Enable ivy, swiper and counsel and set keys.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 (ivy-mode 1)
-#+END_SRC
-
-Basic ivy settings.
-
-#+BEGIN_SRC emacs-lisp :tangle yes
 (setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
+(setq enable-recursive-minibuffers t)
+(global-set-key "\C-s" 'swiper)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
 #+END_SRC
 
 Disable guru-mode because arrow keys are sometimes useful.
