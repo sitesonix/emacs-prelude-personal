@@ -6,7 +6,7 @@
 ;;
 ;; Author: Ryan Griffith <ryan@sitesonix.net>
 ;; URL: https://sitesonix.net/
-;; Version: 2.0
+;; Version: 2.5
 ;; Keywords: org gtd web
 
 ;; This file is not a part of GNU Emacs.
@@ -30,28 +30,23 @@
 
 ;;; Sections:
 
-;; 01. Introduction
-;; 02. Prelude Require Packages
-;; 03. Basic Editor Preferences
-;; 04. Terminals and Shells
-;; 05. Theme Preferences
-;; 06. Dired and Ibuffer Tweaks
-;; 07. Mode Activation/Keybindings
-;; 08. Org Mode Configuration
-;; 09. Web Development
-;; 10. Miscellaneous Stuff
-;; 11. Close Init
+;; 00. Introduction
+;; 01. Prelude Require Packages
+;; 02. Basic Editor Preferences
+;; 03. Theme Preferences
+;; 04. Mode Specific (General)
+;; 05. Dired and Ibuffer Tweaks
+;; 06. Terminals and Shells
+;; 07. Org Mode Configuration
+;; 08. Web Development
+;; 09. Miscellaneous Stuff
+;; 10. Close Init
 
-(prelude-require-packages '(ac-emmet
-                            ac-js2
-                            apache-mode
-                            auto-complete
-                            autopair
-                            bbdb
-                            bookmark+
+(prelude-require-packages '(apache-mode
                             company-web
                             counsel
                             ctags
+                            dash
                             dired+
                             emmet-mode
                             flymd
@@ -60,15 +55,14 @@
                             ivy
                             js2-mode
                             js2-refactor
-                            lorem-ipsum
                             multi-term
                             multiple-cursors
                             olivetti
                             org2blog
                             org-password-manager
-                            org-projectile
-                            paredit
+                            php-mode
                             project-explorer
+                            s
                             simple-httpd
                             skewer-mode
                             swiper
@@ -78,6 +72,27 @@
 
 (setq full-name "Ryan Griffith")
 (setq user-mail-address "ryan@sitesonix.net")
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+(set-face-attribute 'default nil :height 100)
+
+(blink-cursor-mode t)
+
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+(setq uniquify-buffer-name-style 'reverse)
+(setq inhibit-default-init t)
+(setq-default frame-title-format "%b (%f)")
+(global-set-key "\M-n" "\C-u1\C-v")
+(global-set-key "\M-p" "\C-u1\M-v")
+
+(setq display-time-day-and-date t
+      display-time-12hr-format t)
+(display-time)
 
 (defun my-fortune-scratch-message ()
   (interactive)
@@ -98,34 +113,21 @@
   (when fortune
     (setq initial-scratch-message fortune)))
 
-;; Previous scratch buffer
-;; (setq initial-scratch-message
-;;       ";; The GNU GPL was not designed to be open source. - RMS\n\n")
-
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-
-(set-face-attribute 'default nil :height 100)
-
-(blink-cursor-mode t)
-
 (defun rtg/flash-mode-line ()
   (invert-face 'mode-line)
   (run-with-timer 0.05 nil 'invert-face 'mode-line))
 (setq-default
  ring-bell-function 'rtg/flash-mode-line)
 
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(setq echo-keystrokes 0.1
+      use-dialog-box nil
+      visible-bell nil)
 
-(setq display-time-day-and-date t
-      display-time-12hr-format t)
-(display-time)
+(setq tab-always-indent 'complete)
 
-(defun put-date ()
-  (interactive)
-  (insert (shell-command-to-string "date")))
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
 ;; Redefine the default Emacs suspend keybinding...
 (global-unset-key (kbd "C-z")) ; windmove prefix
@@ -137,61 +139,7 @@
 (global-set-key (kbd "C-z <right>") 'windmove-right)
 ;; where S <left/right/up/down> still works outside org
 
-(setq tab-always-indent 'complete)
-
-(add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
-
-(setq uniquify-buffer-name-style 'reverse)
-(setq inhibit-default-init t)
-(setq-default frame-title-format "%b (%f)")
-(global-set-key "\M-n" "\C-u1\C-v")
-(global-set-key "\M-p" "\C-u1\M-v")
-
-(setq echo-keystrokes 0.1
-      use-dialog-box nil
-      visible-bell nil)
-
-(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-
-;; disabled for the time being. Conflicts to resolve.
-;; (add-hook 'before-save-hook 'whitespace-cleanup)
-
-(fset 'yes-or-no-p 'y-or-n-p)
-
 (setq require-final-newline t)
-
-(setq multi-term-program "/bin/bash")
-
-(when (require 'multi-term nil t)
-  (global-set-key (kbd "C-x t") 'multi-term)
-  (global-set-key (kbd "<C-next>") 'multi-term-next)
-  (global-set-key (kbd "<C-prior>") 'multi-term-prev)
-  (setq multi-term-buffer-name "mterm"
-        multi-term-program "/bin/bash"))
-
-(when (require 'term nil t) ; only if term can be loaded..
-  (setq term-bind-key-alist
-        (list (cons "C-c C-c" 'term-interrupt-subjob)
-              (cons "C-p" 'previous-line)
-              (cons "C-n" 'next-line)
-              (cons "M-f" 'term-send-forward-word)
-              (cons "M-b" 'term-send-backward-word)
-              (cons "C-c C-j" 'term-line-mode)
-              (cons "C-c C-k" 'term-char-mode)
-              (cons "M-DEL" 'term-send-backward-kill-word)
-              (cons "M-d" 'term-send-forward-kill-word)
-              (cons "<C-left>" 'term-send-backward-word)
-              (cons "<C-right>" 'term-send-forward-word)
-              (cons "C-r" 'term-send-reverse-search-history)
-              (cons "M-p" 'term-send-raw-meta)
-              (cons "M-y" 'term-send-raw-meta)
-              (cons "C-y" 'term-send-raw))))
-
-(defadvice ido-find-file (after find-file-sudo activate)
-  "Find file as root if necessary."
-  (unless (and buffer-file-name
-               (file-writable-p buffer-file-name))
-    (find-alternate-file (concat "/sudo:root@gnutop:" buffer-file-name))))
 
 (disable-theme 'zenburn)
 
@@ -212,6 +160,32 @@
 ;; Toggle the transparency with F5
 (global-set-key [f5] 'toggle-transparency)
 
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+(global-set-key "\C-s" 'swiper)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+
+(setq prelude-guru nil)
+
+(winner-mode 1)
+
+(which-key-mode)
+
+(global-undo-tree-mode)
+
+(global-set-key (kbd "C-c SPC") 'project-explorer-toggle)
+
+(global-set-key (kbd "C-c z") 'ztree-diff)
+(global-set-key (kbd "C-c Z") 'ztree-dir)
+
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
 (setq dired-listing-switches "-alh")
 
 (require 'find-dired)
@@ -220,11 +194,12 @@
 (setq ibuffer-saved-filter-groups
       (quote (("default"
                ("dired" (mode . dired-mode))
-               ("www" (or
-                       (mode . web-mode)
-                       (mode . js-mode)
+               ("web" (or
+                       (mode . css-mode)
+                       (mode . scss-mode)
                        (mode . js2-mode)
-                       (mode . css-mode)))
+                       (mode . ruby-mode)
+                       (mode . web-mode)))
                ("org" (or
                            (name . "^\\*Calendar\\*$")
                            (name . "^diary$")
@@ -267,34 +242,32 @@
               " "
               filename-and-process)))
 
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
-(global-set-key "\C-s" 'swiper)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(setq multi-term-program "/bin/bash")
 
-(setq prelude-guru nil)
+(when (require 'multi-term nil t)
+  (global-set-key (kbd "C-x t") 'multi-term)
+  (global-set-key (kbd "<C-next>") 'multi-term-next)
+  (global-set-key (kbd "<C-prior>") 'multi-term-prev)
+  (setq multi-term-buffer-name "mterm"
+        multi-term-program "/bin/bash"))
 
-(winner-mode 1)
-
-(which-key-mode)
-
-(setq prelude-whitespace nil)
-
-(global-undo-tree-mode)
-
-(global-set-key (kbd "C-c SPC") 'project-explorer-toggle)
-;; NOTE: when outside of a project I like to use the built-in M-x speedbar
-
-(global-set-key (kbd "C-c z") 'ztree-diff)
-(global-set-key (kbd "C-c Z") 'ztree-dir)
-
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(when (require 'term nil t) ; only if term can be loaded..
+  (setq term-bind-key-alist
+        (list (cons "C-c C-c" 'term-interrupt-subjob)
+              (cons "C-p" 'previous-line)
+              (cons "C-n" 'next-line)
+              (cons "M-f" 'term-send-forward-word)
+              (cons "M-b" 'term-send-backward-word)
+              (cons "C-c C-j" 'term-line-mode)
+              (cons "C-c C-k" 'term-char-mode)
+              (cons "M-DEL" 'term-send-backward-kill-word)
+              (cons "M-d" 'term-send-forward-kill-word)
+              (cons "<C-left>" 'term-send-backward-word)
+              (cons "<C-right>" 'term-send-forward-word)
+              (cons "C-r" 'term-send-reverse-search-history)
+              (cons "M-p" 'term-send-raw-meta)
+              (cons "M-y" 'term-send-raw-meta)
+              (cons "C-y" 'term-send-raw))))
 
 (setq org-agenda-files
       (list "~/org/gtd.org"
@@ -305,6 +278,19 @@
   (interactive)
   (find-file "~/org/gtd.org")
   )
+
+(setq org-default-notes-file "~/org/personal.org")
+;; Org-capture keybinding
+(global-set-key (kbd "C-c c") 'org-capture)
+
+(defun rtg/org-capture-todo ()
+  (interactive)
+  "Capture a TODO item"
+  (org-capture nil "t"))
+;; bind
+(define-key global-map (kbd "C-7") 'rtg/org-capture-todo)
+
+(setq org-return-follows-link t)
 
 (add-to-list 'load-path "~/emacs/org")
 (require 'org)
@@ -319,35 +305,7 @@
         ("d" "Agenda + Next Actions" ((agenda) (todo "NEXT"))))
       )
 
-(defun rtg/org-capture-todo ()
-  (interactive)
-  "Capture a TODO item"
-  (org-capture nil "t"))
-;; bind
-(define-key global-map (kbd "C-7") 'rtg/org-capture-todo)
-
-;; Org-projectile for per-repo TODO files -- package is broken
-;; (require 'org-projectile)
-;; (org-projectile:per-repo)
-;; (setq org-projectile:per-repo-filename "project.org")
-;; (setq org-agenda-files (append org-agenda-files (org-projectile:todo-files)))
-;; (global-set-key (kbd "C-c c") 'org-capture)
-;; (global-set-key (kbd "C-c n p") 'org-projectile:project-todo-completing-read)
-
-(setq org-default-notes-file "~/org/personal.org")
-;; Org-capture keybinding
-(global-set-key (kbd "C-c c") 'org-capture)
-
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
-
-(setq org-return-follows-link t)
-
-(setq org-modules '(org-bbdb
-                    org-gnus))
-(eval-after-load 'org
-  '(org-load-modules-maybe t))
-
-(setq org-export-backends '(org latex html ascii))
 
 (defun rtg/org-agenda-done (&optional arg)
   "Mark current TODO as done.
@@ -390,23 +348,16 @@ this with to-do items than with projects or headings."
         nil
         "\\<IGNORE\\>"))
 
+(setq org-modules '(org-bbdb
+                    org-gnus))
+(eval-after-load 'org
+  '(org-load-modules-maybe t))
+
+(setq org-export-backends '(org latex html ascii))
+
 (global-set-key (kbd "C-x \\") #'align-regexp)
 
-(add-hook 'web-mode-hook 'emmet-mode)
-(add-hook 'css-mode-hook  'emmet-mode)
-
-(eval-after-load 'company-etags
-  '(progn
-     (add-to-list 'company-etags-modes 'web-mode)))
-
-(eval-after-load 'web-mode '(define-key web-mode-map (kbd "s-d") 'php-jump))
-
-(add-to-list 'auto-mode-alist '("\\.js" . js-mode))
-
-(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
-
-(add-hook 'js-mode-hook 'js2-minor-mode)
-(add-hook 'js2-mode-hook 'ac-js2-mode)
+(eval-after-load 'dash '(dash-enable-font-lock))
 
 (add-to-list 'load-path
              "~/.emacs.d/plugins/yasnippet")
@@ -415,41 +366,28 @@ this with to-do items than with projects or headings."
 
 (setq yas-prompt-functions '(yas-x-prompt yas-dropdown-prompt))
 
-(require 'auto-complete)
-(require 'auto-complete-config)
-(ac-config-default)
-(setq ac-auto-start 3)
-(add-to-list 'ac-modes 'web-mode)
-(setq ac-ignore-case t)
-(setq ac-auto-start nil)
-(global-set-key (kbd "C-<tab>") 'auto-complete)
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+)
+(add-hook 'web-mode-hook  'my-web-mode-hook)
 
-;;; auto complete mode
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/ac-dict")
-(ac-config-default)
+(add-hook 'web-mode-hook 'emmet-mode)
+(add-hook 'css-mode-hook  'emmet-mode)
 
-(ac-set-trigger-key "TAB")
-(ac-set-trigger-key "<tab>")
+(eval-after-load 'company-etags
+  '(progn
+     (add-to-list 'company-etags-modes 'web-mode)))
 
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist
-            '("/\\(views\\|html\\|theme\\|templates\\)/.*\\.php\\'" . web-mode))
+(add-hook 'php-mode-hook 'php-enable-wordpress-coding-style)
 
-(setq web-mode-enable-auto-pairing nil)
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
 
-(require 'auto-complete)
-(require 'auto-complete-config)
-(ac-config-default)
-(setq ac-auto-start 3)
-(add-to-list 'ac-modes 'web-mode)
-(setq ac-ignore-case t)
-(setq ac-auto-start nil)
-(global-set-key (kbd "C-<tab>") 'auto-complete)
+(setq js2-skip-preprocessor-directives t)
+
+(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 
 (add-to-list 'load-path "~/.emacs.d/impatient-mode")
 (require 'impatient-mode)
@@ -458,19 +396,9 @@ this with to-do items than with projects or headings."
 (add-hook 'web-mode-hook 'skewer-css-mode)
 (add-hook 'web-mode-hook 'skewer-html-mode)
 
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-all-abbrevs
-                                         try-expand-list
-                                         try-expand-line
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol))
-
-(global-set-key (kbd "M-/") #'hippie-expand)
-(global-set-key (kbd "s-/") #'hippie-expand)
+(defun put-date ()
+  (interactive)
+  (insert (shell-command-to-string "date")))
 
 (delight '((auto-complete-mode nil "auto-complete")
            (beacon-mode nil "beacon")
@@ -489,10 +417,19 @@ this with to-do items than with projects or headings."
            (yas-minor-mode nil "yasnippet")
            (emacs-lisp-mode "EL" :major)))
 
-(defadvice bbdb-read-new-record (after wicked activate)
-  "Prompt for the birthdate as well."
-  (bbdb-record-putprop ad-return-value 'birthdate
-                       (bbdb-read-string "Birthdate (YYYY.MM.DD): ")))
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev-from-kill
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-expand-all-abbrevs
+                                         try-expand-list
+                                         try-expand-line
+                                         try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol))
+
+(global-set-key (kbd "M-/") #'hippie-expand)
+(global-set-key (kbd "s-/") #'hippie-expand)
 
 (defalias 'gk-urls-external-browser 'browse-url-xdg-open)
 (defun gk-browse-url (&rest args)
